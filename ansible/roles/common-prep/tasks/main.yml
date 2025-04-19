@@ -42,10 +42,10 @@
 - name: Join Tailscale tailnet
   shell: >
     tailscale up
-      --authkey={{ ts_auth_key }}
+      --auth-key={{ ts_auth_key }}
       --hostname={{ inventory_hostname }}
       {%- if pi_role == 'plane' -%}
-      --advertise-routes=192.168.10.0/24
+      --advertise-routes "192.168.10.0/24"
       {%- endif -%}
       --accept-routes
   args:

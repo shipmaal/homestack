@@ -1,4 +1,4 @@
-name: CI: Ansible Ping
+name: CI Ansible Ping
 
 on:
   push:

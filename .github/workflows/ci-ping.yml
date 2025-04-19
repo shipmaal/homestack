@@ -17,7 +17,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y python3-pip git curl gnupg
-          pip3 install ansible ansible-sops community.docker
+          pip3 install ansible community.docker
 
       - name: Set up SSH key
         run: |

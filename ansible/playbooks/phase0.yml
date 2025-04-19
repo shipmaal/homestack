@@ -1,0 +1,6 @@
+---
+- name: Phase 0 – Install Docker & Tailscale
+  hosts: pi_plane
+  roles:
+    - common-prep
+

@@ -1,0 +1,52 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for common-prep
+#
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+    autoremove: yes
+
+- name: Install Docker & essentials
+  apt:
+    name:
+      - docker.io
+      - python3-pip
+      - curl
+      - apt-transport-https
+      - ca-certificates
+    state: present
+
+- name: Add ansible user to docker group
+  user:
+    name: ansible
+    groups: docker
+    append: yes
+
+- name: Install Tailscale client
+  shell: curl -fsSL https://tailscale.com/install.sh | sh
+  args:
+    creates: /usr/sbin/tailscaled
+
+- name: Enable and start tailscaled
+  systemd:
+    name: tailscaled
+    enabled: yes
+    state: started
+
+- name: Join Tailscale tailnet
+  shell: >
+    tailscale up
+      --authkey={{ ts_auth_key }}
+      --hostname={{ inventory_hostname }}
+      {%- if pi_role == 'plane' -%}
+      --advertise-routes=192.168.10.0/24
+      {%- endif -%}
+      --accept-routes
+  args:
+    creates: /var/lib/tailscale/tailscaled.state

@@ -1,0 +1,40 @@
+name: CI: Ansible Ping
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    env:
+      TS_AUTH_KEY: ${{ secrets.TS_AUTH_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip git curl gnupg
+          pip3 install ansible ansible-sops community.docker
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GH_RUNNER_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-add ~/.ssh/id_ed25519
+
+      - name: Install and join Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscale up \
+            --authkey=$TS_AUTH_KEY \
+            --hostname=ci-runner \
+            --accept-routes
+
+      - name: Run Ansible ping
+        run: |
+          ansible pi_plane -m ping
+

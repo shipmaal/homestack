@@ -10,9 +10,23 @@ jobs:
     env:
       TS_AUTH_KEY: ${{ secrets.TS_AUTH_KEY }}
     steps:
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
       - name: Tailscale
         uses: tailscale/github-action@v3
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
+      - name: Set up SSH key
+        run: |
+            mkdir -p ~/.ssh
+            echo "${{ secrets.GH_RUNNER_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+            ssh-add ~/.ssh/id_ed25519
+      - name: Ansible Ping
+        run: |
+            ansible pi_plane -m ping
+        

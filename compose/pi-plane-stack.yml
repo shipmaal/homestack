@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  coredns:
+    image: coredns/coredns:1.12.1
+    network_mode: host
+    volumes:
+      - ./Corefile:/etc/coredns/Corefile
+
+  vault:
+    image: hashicorp/vault:1.19
+    network_mode: host
+    cap_add: [IPC_LOCK]
+    env_file: .env
+
+  minio:
+    image: minio/minio:latest
+    command: server /data
+    ports: ["9000:9000"]
+    env_file: .env
+
+  restic-backup:
+    image: restic/restic:latest
+    entrypoint: ["/usr/local/bin/backup.sh"]
+    volumes:
+      - /etc:/etc:ro
+      - /var/lib/vault:/vault-data:ro
+      - ./backup.sh:/usr/local/bin/backup.sh
+
+  hedgedoc:
+    image: hedgedoc/hedgedoc:latest
+    ports: ["3000:3000"]
+    env_file: .env
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    network_mode: host
+

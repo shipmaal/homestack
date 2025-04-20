@@ -1,0 +1,5 @@
+creation_rules:
+  - path_regex: '.*\.(ya?ml|json)$'
+    key_groups:
+      - gpg: ['Your GPG key fingerprint']
+

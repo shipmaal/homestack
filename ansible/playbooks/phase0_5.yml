@@ -1,10 +1,15 @@
-# phase1.yml
+# playbooks/phase0_5.yml
 ---
-- name: Phase 0.5 - k3s Cluster & FluxCD
+- name: Phase 0.5 - k3s on all Pi Plane nodes
   hosts: pi_plane
-  gather_facts: true
   roles:
-    - role: k3s
-      tags: k3s
-    - role: flux
-      tags: flux
+    - k3s
+  tags: k3s
+
+- name: Phase 0.5 - bootstrap Flux only on k3s master
+  hosts: k3s_master
+  roles:
+    - flux
+  tags: flux
+
+

@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/flux-prep
+
+- name: Generate Flux deploy keypair
+  openssh_keypair:
+    path: /home/ansible/.ssh/flux-deploy-key
+    type: ed25519
+    size: 256
+    owner: ansible
+    group: ansible
+    mode: '0600'
+  when: not lookup('file', '/home/ansible/.ssh/flux-deploy-key.pub') | length > 0
+
+
+- name: Show Flux deploy public key for GitHub
+  debug:
+    msg: |
+      ==== COPY THIS as a Deploy Key in GitHub (allow write) ====
+      {{ lookup('file','/home/ansible/.ssh/flux-deploy-key.pub') }}

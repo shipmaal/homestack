@@ -10,18 +10,32 @@
   become_user: root
   register: flux_install
   changed_when: flux_install.stdout != "" and "already installed" not in flux_install.stdout
+  when: not lookup('command', 'flux version') | length > 0
 
-- name: Bootstrap FluxCD
+- name: Ensure flux-system namespace exists
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: flux-system
+    state: present
+
+- name: Check for existing Flux GitRepository
+  kubernetes.core.k8s_info:
+    api_version: source.toolkit.fluxcd.io/v1beta2
+    kind: GitRepository
+    name: flux-system          # default name Flux uses
+    namespace: flux-system
+  register: flux_gitrepo
+  failed_when: false
+
+- name: Bootstrap FluxCD GitOps via SSH
   shell: |
     export KUBECONFIG=/home/ansible/.kube/config
-    flux bootstrap github \
-      --owner=shipmaal \
-      --repository=homestack \
-      --branch=main \
-      --path=clusters/pi-plane \
-      --personal
-  environment:
-    GITHUB_TOKEN: "{{ github_token }}"
-  become_user: ansible
+    flux bootstrap git \
+      --url={{ flux_git_url }} \
+      --branch={{ flux_branch }} \
+      --path={{ flux_path }} \
+      --private-key-file={{ flux_key_file }} 
   args:
     creates: /home/ansible/.flux
+  become_user: ansible

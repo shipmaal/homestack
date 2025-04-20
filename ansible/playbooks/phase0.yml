@@ -5,3 +5,9 @@
     - bootstrap-user
     - common-prep
 
+- name: Phase 0 - add flux ssh key
+  hosts: k3s_master
+  roles:
+    - flux-prep
+    
+

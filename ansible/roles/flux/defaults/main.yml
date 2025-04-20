@@ -1,3 +1,9 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # defaults file for roles/flux
+
+flux_git_url:    "ssh://git@github.com/shipmaal/homestack.git"
+flux_branch:     "main"
+flux_path:       "clusters/pi-plane"
+flux_key_file:   "/home/ansible/.ssh/flux-deploy-key"
+

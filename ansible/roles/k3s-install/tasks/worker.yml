@@ -1,0 +1,28 @@
+# roles/k3s-install/tasks/worker.yml
+---
+
+- name: Wait for k3s API to become available on master
+  wait_for:
+    host: "{{ hostvars[groups['k3s_master'][0]].ansible_host }}"
+    port: 6443
+    delay: 5
+    timeout: 300
+
+- name: Fetch join token from master
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  delegate_to: "{{ groups['k3s_master'][0] }}"
+  register: node_token_b64
+
+
+- name: Install k3s agent
+  shell: |
+    set -x
+    curl -sfL https://get.k3s.io | \
+      K3S_URL="https://{{ hostvars[groups['k3s_master'][0]].ansible_host }}:6443" \
+      K3S_TOKEN="{{ node_token_b64.content | b64decode | trim }}" \
+      sh -s -
+  args:
+    creates: /usr/local/bin/k3s-agent
+  timeout: 600
+

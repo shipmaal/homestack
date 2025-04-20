@@ -1,0 +1,5 @@
+- include_tasks: master.yml
+  when: "'k3s_master' in group_names"
+
+- include_tasks: worker.yml
+  when: "'k3s_workers' in group_names"

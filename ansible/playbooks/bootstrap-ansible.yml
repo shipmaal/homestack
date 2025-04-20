@@ -1,7 +1,7 @@
 ---
 - name: Bootstrap the Ansible user
   hosts: pi_plane
-  gather_facts: yes
+  gather_facts: true
   remote_user: ubuntu
   vars:
     public_key_path: "{{ lookup('env','HOME') + '/.ssh/id_ed25519.pub' }}"

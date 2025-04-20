@@ -1,0 +1,22 @@
+---
+- name: Install k3s server
+  shell: |
+    curl -sfL https://get.k3s.io |  sh -
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Ensure .kube directory exists
+  file:
+    path: /home/ansible/.kube
+    state: directory
+    owner: ansible
+    mode: 0700
+
+- name: Copy server kubeconfig to ansible user
+  become: true
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/ansible/.kube/config
+    owner: ansible
+    remote_src: true
+    mode: 0600

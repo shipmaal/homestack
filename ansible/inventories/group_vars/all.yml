@@ -1,6 +1,7 @@
 mgmt_vlan: 10
+mgmt_subnet: "192.168.10.0/24"
 domain: lab204.dev
 
 # Tailscale auth key pulled from the environment
 ts_auth_key: "{{ lookup('env', 'TS_AUTH_KEY') }}"
-
+github_token: "{{ lookup('env','GITHUB_TOKEN') }}"

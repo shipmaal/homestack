@@ -12,21 +12,14 @@
     upgrade: dist
     autoremove: yes
 
-- name: Install Docker & essentials
+- name: Install essentials
   apt:
     name:
-      - docker.io
       - python3-pip
       - curl
       - apt-transport-https
       - ca-certificates
     state: present
-
-- name: Add ansible user to docker group
-  user:
-    name: ansible
-    groups: docker
-    append: yes
 
 - name: Install Tailscale client
   shell: curl -fsSL https://tailscale.com/install.sh | sh
@@ -45,7 +38,7 @@
       --auth-key={{ ts_auth_key }}
       --hostname={{ inventory_hostname }}
       {%- if pi_role == 'plane' -%}
-      --advertise-routes "192.168.10.0/24"
+      --advertise-routes {{ mgmt_subnet }}
       {%- endif -%}
       --accept-routes
   args:

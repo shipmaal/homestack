@@ -1,0 +1,10 @@
+# phase1.yml
+---
+- name: Phase 0.5 - k3s Cluster & FluxCD
+  hosts: pi_plane
+  gather_facts: true
+  roles:
+    - role: k3s
+      tags: k3s
+    - role: flux
+      tags: flux

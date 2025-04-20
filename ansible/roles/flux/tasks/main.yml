@@ -1,0 +1,27 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/flux
+- name: Install Flux CLI
+  shell: |
+    curl -s https://fluxcd.io/install.sh | sudo bash
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: root
+  register: flux_install
+  changed_when: flux_install.stdout != "" and "already installed" not in flux_install.stdout
+
+- name: Bootstrap FluxCD
+  shell: |
+    export KUBECONFIG=/home/ansible/.kube/config
+    flux bootstrap github \
+      --owner=shipmaal \
+      --repository=homestack \
+      --branch=main \
+      --path=clusters/pi-plane \
+      --personal
+  environment:
+    GITHUB_TOKEN: "{{ github_token }}"
+  become_user: ansible
+  args:
+    creates: /home/ansible/.flux

@@ -1,0 +1,61 @@
+---
+- name: Uninstall k3s from all nodes
+  hosts: pi_plane
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check for k3s-uninstall script
+      stat:
+        path: /usr/local/bin/k3s-uninstall.sh
+      register: k3s_uninstall
+
+    - name: Check for k3s-agent-uninstall script
+      stat:
+        path: /usr/local/bin/k3s-agent-uninstall.sh
+      register: k3s_agent_uninstall
+
+    - name: Run server uninstall on the master
+      shell: /usr/local/bin/k3s-uninstall.sh
+      when:
+        - inventory_hostname == groups['k3s_master'][0]
+        - k3s_uninstall.stat.exists
+      ignore_errors: true
+
+    - name: Run agent uninstall on workers
+      shell: /usr/local/bin/k3s-agent-uninstall.sh
+      when:
+        - inventory_hostname in groups['k3s_workers']
+        - k3s_agent_uninstall.stat.exists
+      ignore_errors: true
+
+    - name: Remove k3s configuration directory
+      file:
+        path: /etc/rancher/k3s
+        state: absent
+
+    - name: Remove systemd service files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/systemd/system/k3s.service
+        - /etc/systemd/system/k3s-agent.service
+
+    - name: Clean up kubeconfig for ansible user
+      file:
+        path: /home/ansible/.kube
+        state: absent
+
+    - name: Remove k3s binaries
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/bin/k3s
+        - /usr/local/bin/k3s-agent
+        - /usr/local/bin/kubectl
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: true

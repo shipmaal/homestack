@@ -1,0 +1,6 @@
+timezone:          "America/New_York"
+apt_unattended:    true
+disable_root_ssh:  true
+firewall_ports:
+  - "22/tcp"
+  - "6443/tcp"     # k3s API

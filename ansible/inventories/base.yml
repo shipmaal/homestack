@@ -1,0 +1,33 @@
+# ansible/inventories/base.yml
+all:
+  vars:
+    mgmt_gw: 192.168.10.1
+    nameservers: [192.168.10.1]
+  children:
+    # Raspberry Pi control-plane
+    pis:
+      vars:
+        mgmt_iface: eth0
+      hosts:
+        rpi5-8gb-01:
+          ansible_host: 192.168.10.11
+          ip_addr: 192.168.10.11/24
+          hostname: rpi5-8gb-01
+        rpi5-8gb-02:
+          ansible_host: 192.168.10.12
+          ip_addr: 192.168.10.12/24
+          hostname: rpi5-8gb-02
+        rpi5-4gb-03:
+          ansible_host: 192.168.10.13
+          ip_addr: 192.168.10.13/24
+          hostname: rpi5-4gb-03
+
+    # Mini-PC hypervisor
+    minis:
+      vars:
+        mgmt_iface: bond0
+      hosts:
+        GMKtecM5:
+          ansible_host: 192.168.10.20
+          ip_addr: 192.168.10.20/24
+          hostname: GMKtecM5
